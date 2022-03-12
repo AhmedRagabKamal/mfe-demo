@@ -4,24 +4,22 @@ const { dependencies } = require("../package.json");
 
 const commonConfig = require("./webpack.common");
 
-const devConfig = {
-  mode: "development",
-  devServer: {
-    port: 8081,
-    historyApiFallback: {
-      index: "index.html",
-    },
+const domain = process.env.PRODUCTION_DOMAIN;
+
+const prodConfig = {
+  mode: "production",
+  output: {
+    filename: "[name].[contenthash].js",
   },
   plugins: [
     new ModuleFederationPlugin({
-      name: "marketing",
-      filename: "remoteEntry.js",
-      exposes: {
-        "./marketingApp": "./src/bootstrap",
+      name: "container",
+      remotes: {
+        marketing: `marketing@${domain}/marketing/remoteEntry.js`,
       },
       shared: dependencies,
     }),
   ],
 };
 
-module.exports = merge(commonConfig, devConfig);
+module.exports = merge(commonConfig, prodConfig);
